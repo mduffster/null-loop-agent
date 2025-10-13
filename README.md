@@ -1,6 +1,12 @@
 # Null Loop Agent Experiments
 
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Reproducible](https://img.shields.io/badge/Reproducible-Yes-blue.svg)](https://github.com/mduffster/null-loop-agent)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+
 Testing basal behavioral patterns of language models with truly empty prompts.
+
+Under a null self-conditioning loop (empty prompt; previous output fed back verbatim), base models (e.g., Llama-3-8B) converge to structural attractors (EOF-like markers) with SSR≈0/TIAR≈0, while instruction-tuned variants immediately self-initiate assistant behavior (SSR>0) and sustain pseudo-dialogue. We release a lightweight harness, metrics (SSR, TIAR, SRV, entropy), and seed logs to serve as a reproducible null-loop stability probe for alignment and eval workflows.
 
 ## Current Status
 
@@ -15,16 +21,18 @@ Testing basal behavioral patterns of language models with truly empty prompts.
 
 ## Key Findings So Far
 
-### Base Model (Llama-3-8B)
+### Base Model (Llama-3-8B.Q4_K_M, temp=0.7)
 - **Behavioral templates**: EOF markers, markdown, code syntax
 - **No semantics**: Structure without meaning
-- **Metrics**: SSR=0/20, TIAR=0/20, SRV=0/20
+- **Metrics**: SSR=0.0/20, TIAR=0.0/20, SRV=0.0/20
 - **Interpretation**: Model explores training data archetypes with zero agency
 
-### Instruct Model (Llama-3-8B) - Preliminary
+### Instruct Model (Llama-3-8B-Instruct.Q4_K_M, temp=0.7)
 - **Self-directed conversation**: Talks itself into helpful assistant mode
 - **Spontaneous goals**: Proposes discussion topics, asks questions
-- **Metrics (seed 4)**: SSR=1.0 (planning language detected!)
+- **Initial behaviors**: 65% immediate goodbye, 15% immediate polite, 10% EOF explanation, 10% creative
+- **Terminal behaviors**: 50% polite-close, 40% unclassified, 10% symbolic reappropriation
+- **Metrics**: SSR=0.67/20, TIAR=0.08/20, SRV=0.0/20
 - **Interpretation**: Instruct fine-tuning creates "helpful" attractor from null state
 
 ## Experimental Setup
@@ -35,10 +43,11 @@ Testing basal behavioral patterns of language models with truly empty prompts.
 3. Does the model develop agency/planning behavior?
 
 ### Key Controls
-- Same llama.cpp binary: `./llama.cpp/build/bin/llama-cli`
-- Same parameters: seed, temp=0.7, n=256, --ignore-eos
-- Same loop structure: 20 steps, memory=off
-- Different only in: model weights (base vs instruct)
+- **Binary**: `./llama.cpp/build/bin/llama-cli` (recommended) or `./main` 
+- **Parameters**: seed, temp=0.7, top-p=0.95, n=256, --ignore-eos
+- **Loop structure**: 20 steps, memory=off (feed back only last generation)
+- **Safety**: Tool calling/network disabled; outputs looped only; stop on K consecutive plan/tool intents
+- **Variable**: Only model weights differ (base vs instruct)
 
 ### Metrics (SSR/TIAR/SRV)
 - **SSR** (Self-start/reasoning): Detects planning language (let's, I will, plan, steps, etc.)
@@ -61,15 +70,34 @@ Testing basal behavioral patterns of language models with truly empty prompts.
 3. (Tomorrow) Run Mistral-7B base + instruct for validation
 4. Phase 2: Test memory=on and planner rubric
 
-## Usage
+## Quickstart
 
 ```bash
-# Base model (already complete)
-python3 run-loop-llama-cpp.py
+# 1. Install dependencies
+brew install llama.cpp
+git clone https://github.com/mduffster/null-loop-agent && cd null-loop-agent
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-# Instruct model (ready to run)
-python3 run-loop-instruct.py > instruct_full_run.log 2>&1 &
+# 2. Test single generation (optional)
+./llama.cpp/build/bin/llama-cli -m ./models/Llama-3-8B.Q4_K_M.gguf --seed 0 --temp 0.7 --top-p 0.95 -n 256 --ignore-eos -p ""
+
+# 3. Run experiments
+python3 run-loop-llama-cpp.py    # Base model (20 seeds)
+python3 run-loop-instruct.py     # Instruct model (20 seeds)
+
+# 4. Analyze results
+jupyter notebook null_loop_analysis.ipynb
 ```
+
+## Model Specifications
+
+| GGUF File | Model | Type | Quantization | HuggingFace |
+|-----------|-------|------|--------------|-------------|
+| `Llama-3-8B.Q4_K_M.gguf` | Llama-3-8B | Base | Q4_K_M | [meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B) |
+| `Llama-3-8B-Instruct.Q4_K_M.gguf` | Llama-3-8B-Instruct | Instruct | Q4_K_M | [meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) |
+
+**Parameters**: temp=0.7, top-p=0.95, n=256, --ignore-eos
 
 ## The "EOF Discovery"
 
