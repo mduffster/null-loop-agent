@@ -64,12 +64,22 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - `EXPERIMENT_SETUP.md` - Detailed methodology
 - `ANALYSIS.md` - Findings and interpretation
 
-## Next Steps
+## Future Analysis
 
-1. ⏳ Complete Llama-3-8B Instruct (20 seeds)
-2. Compare aggregate statistics
-3. (Tomorrow) Run Mistral-7B base + instruct for validation
-4. Phase 2: Test memory=on and planner rubric
+**Phase 2 - Model Validation:**
+- Mistral-7B-v0.3 base vs instruct comparison
+- Additional model families (Qwen, Gemma) for robustness testing
+- Cross-architecture behavioral pattern validation
+
+**Phase 3 - Extended Metrics:**
+- Memory=on experiments (accumulative context)
+- Entropy-per-step analysis from logits
+- Planner rubric integration for enhanced agency detection
+
+**Phase 4 - Scaling Analysis:**
+- Parameter count effects (1B, 7B, 8B, 13B+ models)
+- Training data size correlation with behavioral attractors
+- Fine-tuning method comparison (RLHF vs SFT vs DPO)
 
 ## Quickstart
 
