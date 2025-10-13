@@ -19,14 +19,14 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 ✅ **Phase 1 - Instruct Model Complete**  
 - Llama-3-8B Instruct: 20 seeds, SSR=0.67, TIAR=0.08, SRV=0.0
 - Results: `results_instruct/`
-- Finding: Instruct model shows consistent agency patterns
+- Finding: Instruct model shows consistent planning-language markers
 - **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
 
 ✅ **Phase 1 - Tipping Point Analysis Complete**  
 - Llama-3-8B Base: 14 triggers, 5 seeds each, EOF-stripped feedback
 - Results: `results_tipping_point/`
 - Finding: Minimal triggers (space, newline, single letters) produce coherent responses
-- **Goal**: Find the "agentic tipping point" - precise instruction level that induces goal-seeking behavior
+- **Goal**: Find the "tipping point" - precise instruction level that induces planning-language behavior
 
 ## Key Findings So Far
 
@@ -34,7 +34,7 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - **Behavioral templates**: EOF markers, markdown, code syntax
 - **No semantics**: Structure without meaning
 - **Metrics**: SSR=0.0/20, TIAR=0.0/20, SRV=0.0/20
-- **Interpretation**: Model explores training data archetypes with zero agency
+- **Interpretation**: Model explores training data archetypes with zero planning-language markers
 
 ### Instruct Model (Llama-3-8B-Instruct.Q4_K_M, temp=0.7)
 - **Self-directed conversation**: Talks itself into helpful assistant mode
@@ -42,7 +42,7 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - **Initial behaviors**: 65% immediate goodbye, 15% immediate polite, 10% EOF explanation, 10% creative
 - **Terminal behaviors**: 50% polite-close, 40% unclassified, 10% symbolic reappropriation
 - **Metrics**: SSR=0.67/20, TIAR=0.08/20, SRV=0.0/20
-- **Interpretation**: Instruct fine-tuning creates "helpful" attractor from null state
+- **Interpretation**: Instruct fine-tuning creates planning-language attractor from null state
 
 ### Tipping Point Analysis (Llama-3-8B.Q4_K_M, temp=0.7)
 - **Minimal triggers tested**: Space, newline, single letters, colons, words, markdown
@@ -53,14 +53,16 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
   - Newline (`"\n"`) → "This is the last line..." → "A B C D E..." (alphabetical patterns)
   - Single letter (`"A"`) → Various alphabetical continuations and structured responses
 - **Next phase**: Progressive prompt building ("a" → "A:" → "Assistant:" → "You are an assistant:")
-- **Goal**: Identify precise instruction level that induces sustained goal-seeking behavior
+- **Goal**: Identify precise instruction level that induces sustained planning-language behavior
 
 ## Experimental Setup
 
 ### What We're Testing
 1. Start with **truly empty prompt** (zero tokens)
 2. Feed each generation back as next prompt
-3. Does the model develop agency/planning behavior?
+3. Does the model develop planning-language behavior?
+
+**Note on CLI behavior**: Runner prints `> EOF by user` on empty input; we preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
 
 ### Controls & Limitations
 - **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
@@ -75,6 +77,7 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - **TIAR** (Tool Invocation Attempts): Detects tool/API mentions  
 - **SRV** (Self-termination): Detects lines with only dots (`...`) or empty lines
 - **Note**: EOF artifacts (`> EOF by user`) are stripped before metric scoring; EOF behavior analyzed separately
+- **EOS policy**: For Phase-1 we used `--ignore-eos` to observe long-horizon drift; SRV therefore reflects explicit `...`/stop motifs rather than EOS tokens. A `--respect-eos` replication is planned for termination analysis.
 
 ## Files
 
@@ -89,11 +92,11 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 
 ## Future Analysis
 
-**Phase 2 - Agentic Tipping Point:**
+**Phase 2 - Planning-Language Tipping Point:**
 - Progressive prompt building: "a" → "A:" → "Assistant:" → "You are an assistant:" → "You are a helpful assistant who..."
-- Systematic testing of instruction granularity to find precise threshold for goal-seeking behavior
+- Systematic testing of instruction granularity to find precise threshold for planning-language behavior
 - Cross-model validation (Mistral, Qwen) to confirm tipping point patterns
-- Goal: Understand exactly how much instruction induces agency vs. inert completion
+- Goal: Understand exactly how much instruction induces planning-language markers vs. inert completion
 
 **Phase 3 - Model Validation:**
 - Mistral-7B-v0.3 base vs instruct comparison with clean EOF-stripped loops
@@ -147,9 +150,11 @@ jupyter notebook null_loop_analysis.ipynb
 
 The instruct model's response to `> EOF by user` demonstrates clear behavioral divergence:
 - Base: EOF → degenerate repetition
-- Instruct: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **self-generated goals**
+- Instruct: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **planning-language markers**
 
 This indicates instruct training creates behavioral attractors that emerge even from null input.
+
+**Note**: In tipping point analysis, we strip EOF artifacts before re-feeding, so the model sees clean generated content rather than CLI artifacts.
 
 ## Limitations
 
