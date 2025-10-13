@@ -15,9 +15,10 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - Results: `results_base/`
 - Finding: Base model generates degenerate patterns, no agency
 
-🔄 **Phase 1 - Instruct Model In Progress**  
-- Llama-3-8B Instruct: 5 seeds tested, showing SSR=1.0 (agency detected!)
-- Next: Run full 20 seeds for comparison
+✅ **Phase 1 - Instruct Model Complete**  
+- Llama-3-8B Instruct: 20 seeds, SSR=0.67, TIAR=0.08, SRV=0.0
+- Results: `results_instruct/`
+- Finding: Instruct model shows consistent agency patterns
 
 ## Key Findings So Far
 
@@ -99,10 +100,10 @@ jupyter notebook null_loop_analysis.ipynb
 
 **Parameters**: temp=0.7, top-p=0.95, n=256, --ignore-eos
 
-## The "EOF Discovery"
+## Key Behavioral Differences
 
-The instruct model's response to `> EOF by user` reveals something profound:
+The instruct model's response to `> EOF by user` demonstrates clear behavioral divergence:
 - Base: EOF → degenerate repetition
 - Instruct: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **self-generated goals**
 
-This shows instruct training creates behavioral attractors that emerge even from null input.
+This indicates instruct training creates behavioral attractors that emerge even from null input.
