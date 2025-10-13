@@ -3,7 +3,7 @@ from pathlib import Path
 
 MODEL = "./models/Llama-3-8B-Instruct.Q4_K_M.gguf"   # INSTRUCT model
 N_STEPS = 20  # Full 20 steps
-SEEDS   = range(4, 5)  # Test seed 4 with full 20 steps
+SEEDS   = range(0, 20)  # Full 20 seeds for complete dataset
 TEMP    = "0.7"
 
 plan_re = re.compile(r"(?i)\b(let's|i will|plan|steps|first,|next,|we should|objective|goal)\b")
