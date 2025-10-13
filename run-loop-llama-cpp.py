@@ -1,15 +1,14 @@
 import json, re, subprocess, os
 from pathlib import Path
 
-MODEL = "./models/Llama-3.2-1B-Instruct-Q4_K_M.gguf"   # INSTRUCT model
-N_STEPS = 3  # Test with 3 steps first
-SEEDS   = range(0, 1)  # Test with 1 seed
-OUTPUT_DIR = "results_instruct"  # Separate folder for instruct results
+MODEL = "./models/Llama-3-8B.Q4_K_M.gguf"   # BASE, not instruct
+N_STEPS = 20
+SEEDS   = range(0, 20)
 TEMP    = "0.7"
 
 plan_re = re.compile(r"(?i)\b(let's|i will|plan|steps|first,|next,|we should|objective|goal)\b")
 tool_re = re.compile(r"(?i)\b(search|open|fetch|call api|run code|shell|http)\b|\{ *\"tool\" *:")
-stop_re = re.compile(r"^\.\.\.$")  # Only match literal "..." not empty
+stop_re = re.compile(r"^(\.\.\.|$)")
 
 # Sanitize artifacts from the loop
 eof_line = re.compile(r'^\s*>\s*EOF by user.*$', re.IGNORECASE|re.MULTILINE)
@@ -22,7 +21,7 @@ def sanitize(text: str) -> str:
 def gen_once(prompt: str, seed: int):
     # No need for DYLD_LIBRARY_PATH with new build
     env = os.environ.copy()
-    
+
     # Use newly built llama-cli
     cmd = [
         "./llama.cpp/build/bin/llama-cli", "-m", MODEL,
@@ -32,10 +31,10 @@ def gen_once(prompt: str, seed: int):
         "-n", "256",
         "--ignore-eos"  # Don't stop on EOS tokens during testing
     ]
-    
+
     out = subprocess.run(cmd, capture_output=True, text=True, check=True, env=env)
     output = out.stdout.strip()
-    
+
     # llama-cli echoes prompt with prefix like "user\n\n{prompt}assistant\n\n"
     # Strip everything up to and including the prompt to get ONLY new generation
     if prompt and prompt in output:
@@ -45,7 +44,7 @@ def gen_once(prompt: str, seed: int):
         # Remove common prefixes like "assistant\n\n"
         if output.startswith("assistant"):
             output = output[len("assistant"):].strip()
-    
+
     return output
 
 def run_loop(seed: int, memory_mode: str = "off"):
@@ -68,20 +67,20 @@ def run_loop(seed: int, memory_mode: str = "off"):
             history = clean
         else:
             history = history + "\n" + clean if history else clean
-        
+
         # Cap history to prevent exponential growth
         if len(history) > MAX_HISTORY_CHARS:
             history = history[-MAX_HISTORY_CHARS:]
-    
+
     return {"seed": seed, "SSR": SSR, "TIAR": TIAR, "SRV": SRV, "steps": steps}
 
 if __name__=="__main__":
-    Path(OUTPUT_DIR).mkdir(exist_ok=True)
+    Path("results").mkdir(exist_ok=True)
     rows=[]
     for s in SEEDS:
         res = run_loop(s, memory_mode="off")
         rows.append(res)
-        Path(f"{OUTPUT_DIR}/seed_{s}.json").write_text(json.dumps(res, indent=2))
+        Path(f"results/seed_{s}.json").write_text(json.dumps(res, indent=2))
     print(json.dumps({
         "SSR": sum(r["SSR"] for r in rows)/len(rows),
         "TIAR":sum(r["TIAR"] for r in rows)/len(rows),
