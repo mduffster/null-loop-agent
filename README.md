@@ -43,10 +43,11 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 2. Feed each generation back as next prompt
 3. Does the model develop agency/planning behavior?
 
-### Key Controls
-- **Binary**: `./llama.cpp/build/bin/llama-cli` (recommended) or `./main` 
-- **Parameters**: seed, temp=0.7, top-p=0.95, n=256, --ignore-eos
-- **Loop structure**: 20 steps, memory=off (feed back only last generation)
+### Controls & Limitations
+- **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
+- **Completion mode**: llama.cpp `llama-cli` (no chat wrapper) for both base and instruct models
+- **Memory**: Off (context cleared each step); seed, temp=0.7, top-p=0.95, n=256
+- **Known limits**: Keyword-based SSR proxy; BOS tokens may influence behavior; only Llama-3 tested (Mistral next)
 - **Safety**: Tool calling/network disabled; outputs looped only; stop on K consecutive plan/tool intents
 - **Variable**: Only model weights differ (base vs instruct)
 
@@ -99,6 +100,10 @@ python3 run-loop-instruct.py     # Instruct model (20 seeds)
 
 # 4. Analyze results
 jupyter notebook null_loop_analysis.ipynb
+
+# Expected outputs:
+# Llama-3-8B base → mean SSR ~0.0, TIAR ~0.0, SRV ~0.0
+# Llama-3-8B instruct → mean SSR ~0.67, TIAR ~0.08, SRV ~0.0
 ```
 
 ## Model Specifications
@@ -117,3 +122,12 @@ The instruct model's response to `> EOF by user` demonstrates clear behavioral d
 - Instruct: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **self-generated goals**
 
 This indicates instruct training creates behavioral attractors that emerge even from null input.
+
+## Limitations
+
+- **Metric limitations**: SSR/TIAR/SRV are keyword-based proxies; true agency measurement requires more sophisticated analysis
+- **BOS token effects**: BOS tokens enabled by default; future work should test `--no-bos` to isolate pure completion behavior
+- **Template effects**: No chat templates used, but BOS/EOS handling may influence behavior
+- **Single architecture**: Results limited to Llama-3 family; cross-architecture validation needed (Mistral planned)
+- **Quantization effects**: Q4_K_M quantization may affect behavioral patterns compared to full precision
+- **Sample size**: 20 seeds per condition provides statistical power but larger samples would strengthen conclusions
