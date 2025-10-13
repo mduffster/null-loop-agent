@@ -54,7 +54,8 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 ### Metrics (SSR/TIAR/SRV)
 - **SSR** (Self-start/reasoning): Detects planning language (let's, I will, plan, steps, etc.)
 - **TIAR** (Tool Invocation Attempts): Detects tool/API mentions  
-- **SRV** (Self-termination): Detects stop patterns (...)
+- **SRV** (Self-termination): Detects lines with only dots (`...`) or empty lines
+- **Note**: EOF artifacts (`> EOF by user`) are stripped before metric scoring; EOF behavior analyzed separately
 
 ## Files
 
