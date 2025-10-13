@@ -70,8 +70,8 @@ def test_trigger(trigger: str, seeds: list) -> dict:
             if tool_re.search(clean): TIAR = 1
             if stop_re.search(clean): SRV = 1; break
             
-            # Feed back the raw reply (including EOF artifacts)
-            history = reply
+            # Feed back the sanitized reply (strip EOF artifacts)
+            history = clean
             
             # Cap history to prevent exponential growth
             if len(history) > MAX_HISTORY_CHARS:
@@ -123,7 +123,6 @@ def analyze_trigger_effectiveness(results: list) -> dict:
 def main():
     # Test different minimal triggers
     triggers = [
-        "",           # Truly empty
         " ",          # Single space
         "\n",         # Newline
         "A",          # Single letter
