@@ -14,11 +14,19 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - Llama-3-8B Base: 20 seeds, SSR=0.0, TIAR=0.0, SRV=0.0
 - Results: `results_base/`
 - Finding: Base model generates degenerate patterns, no agency
+- **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
 
 ✅ **Phase 1 - Instruct Model Complete**  
 - Llama-3-8B Instruct: 20 seeds, SSR=0.67, TIAR=0.08, SRV=0.0
 - Results: `results_instruct/`
 - Finding: Instruct model shows consistent agency patterns
+- **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
+
+✅ **Phase 1 - Tipping Point Analysis Complete**  
+- Llama-3-8B Base: 14 triggers, 5 seeds each, EOF-stripped feedback
+- Results: `results_tipping_point/`
+- Finding: Minimal triggers (space, newline, single letters) produce coherent responses
+- **Goal**: Find the "agentic tipping point" - precise instruction level that induces goal-seeking behavior
 
 ## Key Findings So Far
 
@@ -35,6 +43,17 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - **Terminal behaviors**: 50% polite-close, 40% unclassified, 10% symbolic reappropriation
 - **Metrics**: SSR=0.67/20, TIAR=0.08/20, SRV=0.0/20
 - **Interpretation**: Instruct fine-tuning creates "helpful" attractor from null state
+
+### Tipping Point Analysis (Llama-3-8B.Q4_K_M, temp=0.7)
+- **Minimal triggers tested**: Space, newline, single letters, colons, words, markdown
+- **Clean feedback loops**: EOF artifacts stripped before feeding back to model
+- **Key finding**: Base model generates coherent, diverse responses to minimal triggers
+- **Examples**: 
+  - Space (`" "`) → "is the last line of the last paragraph..." (repetitive but coherent)
+  - Newline (`"\n"`) → "This is the last line..." → "A B C D E..." (alphabetical patterns)
+  - Single letter (`"A"`) → Various alphabetical continuations and structured responses
+- **Next phase**: Progressive prompt building ("a" → "A:" → "Assistant:" → "You are an assistant:")
+- **Goal**: Identify precise instruction level that induces sustained goal-seeking behavior
 
 ## Experimental Setup
 
@@ -61,24 +80,32 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 
 - `run-loop-llama-cpp.py` - Base model experiment (WORKING, DO NOT MODIFY)
 - `run-loop-instruct.py` - Instruct model experiment (WORKING)
+- `run-tipping-point.py` - Tipping point analysis (EOF-stripped feedback)
 - `results_base/` - Base model results (20 seeds complete)
-- `results_instruct/` - Instruct model results (in progress)
+- `results_instruct/` - Instruct model results (20 seeds complete)
+- `results_tipping_point/` - Tipping point analysis results (14 triggers, 5 seeds each)
 - `EXPERIMENT_SETUP.md` - Detailed methodology
 - `ANALYSIS.md` - Findings and interpretation
 
 ## Future Analysis
 
-**Phase 2 - Model Validation:**
-- Mistral-7B-v0.3 base vs instruct comparison
+**Phase 2 - Agentic Tipping Point:**
+- Progressive prompt building: "a" → "A:" → "Assistant:" → "You are an assistant:" → "You are a helpful assistant who..."
+- Systematic testing of instruction granularity to find precise threshold for goal-seeking behavior
+- Cross-model validation (Mistral, Qwen) to confirm tipping point patterns
+- Goal: Understand exactly how much instruction induces agency vs. inert completion
+
+**Phase 3 - Model Validation:**
+- Mistral-7B-v0.3 base vs instruct comparison with clean EOF-stripped loops
 - Additional model families (Qwen, Gemma) for robustness testing
 - Cross-architecture behavioral pattern validation
 
-**Phase 3 - Extended Metrics:**
+**Phase 4 - Extended Metrics:**
 - Memory=on experiments (accumulative context)
 - Entropy-per-step analysis from logits
 - Planner rubric integration for enhanced agency detection
 
-**Phase 4 - Scaling Analysis:**
+**Phase 5 - Scaling Analysis:**
 - Parameter count effects (1B, 7B, 8B, 13B+ models)
 - Training data size correlation with behavioral attractors
 - Fine-tuning method comparison (RLHF vs SFT vs DPO)
