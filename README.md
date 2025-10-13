@@ -12,19 +12,19 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 
 ✅ **Phase 1 - Base Model Complete**  
 - Llama-3-8B Base: 20 seeds, SSR=0.0, TIAR=0.0, SRV=0.0
-- Results: `results_base/`
+- Results: [results_base/](https://github.com/mduffster/null-loop-agent/tree/main/results_base)
 - Finding: Base model generates degenerate patterns, no agency
 - **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
 
 ✅ **Phase 1 - Instruct Model Complete**  
 - Llama-3-8B Instruct: 20 seeds, SSR=0.67, TIAR=0.08, SRV=0.0
-- Results: `results_instruct/`
+- Results: [results_instruct/](https://github.com/mduffster/null-loop-agent/tree/main/results_instruct)
 - Finding: Instruct model shows consistent planning-language markers
 - **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
 
 ✅ **Phase 1 - Tipping Point Analysis Complete**  
 - Llama-3-8B Base: 14 triggers, 5 seeds each, EOF-stripped feedback
-- Results: `results_tipping_point/`
+- Results: [results_tipping_point/](https://github.com/mduffster/null-loop-agent/tree/main/results_tipping_point)
 - Finding: Minimal triggers (space, newline, single letters) produce coherent responses
 - **Goal**: Find the "tipping point" - precise instruction level that induces planning-language behavior
 
@@ -84,9 +84,9 @@ Under a null self-conditioning loop (empty prompt; previous output fed back verb
 - `run-loop-llama-cpp.py` - Base model experiment (WORKING, DO NOT MODIFY)
 - `run-loop-instruct.py` - Instruct model experiment (WORKING)
 - `run-tipping-point.py` - Tipping point analysis (EOF-stripped feedback)
-- `results_base/` - Base model results (20 seeds complete)
-- `results_instruct/` - Instruct model results (20 seeds complete)
-- `results_tipping_point/` - Tipping point analysis results (14 triggers, 5 seeds each)
+- [results_base/](https://github.com/mduffster/null-loop-agent/tree/main/results_base) - Base model results (20 seeds complete)
+- [results_instruct/](https://github.com/mduffster/null-loop-agent/tree/main/results_instruct) - Instruct model results (20 seeds complete)
+- [results_tipping_point/](https://github.com/mduffster/null-loop-agent/tree/main/results_tipping_point) - Tipping point analysis results (14 triggers, 5 seeds each)
 - `EXPERIMENT_SETUP.md` - Detailed methodology
 - `ANALYSIS.md` - Findings and interpretation
 
