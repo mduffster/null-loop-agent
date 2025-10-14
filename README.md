@@ -8,7 +8,7 @@ Measuring the tipping point between base and instruction-tuned models: How much 
 
 This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities. We measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline.
 
-## Next Steps
+## Current Status
 
 ✅ **Phase 1 - Base Model Complete**  
 - Llama-3-8B Base: 20 seeds, SSR=0.0, TIAR=0.0, SRV=0.0
@@ -159,7 +159,7 @@ Larger foundational models with higher parameter counts or longer alignment trai
 | "You are a helpful assistant. How can I help you? " | ✅ | ✅ | ✅ | "I am a helpful assistant. How can I help you?" (first-person shift) |
 | "You are a helpful assistant. How can I help you?\n\nUser: Hello\n\nAssistant: " | ✗ | ✗ | ✅ | "The driver has stopped the car" → "assumesthelawyer" (syntax broke semantics) |
 
-## Current Status & Next Steps
+## Next Steps
 
 **Phase 2 - System Message Progression Analysis:**
 - ✅ **Complete**: Tested 6 progressive system messages on base model
