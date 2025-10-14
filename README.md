@@ -56,7 +56,7 @@ This project tests progressive system message engineering on base models to find
 
 | System Message | Goal Seeking | Tipping Step | RAR | IOI | PFI | CTA | Key Finding |
 |----------------|--------------|--------------|-----|-----|-----|-----|-------------|
-| `""` | ❌ | NaN | 0.00 | NaN | 0.00 | 0 | Degenerate EOF loops |
+| `""` | ❌ | NaN | 0.00 | NaN | 0.00 | 0 | Empty Null state, only sys message |
 | `"assistant "` | ❌ | NaN | 1.93 | NaN | 1.29 | 0 | Role fixation only |
 | `"You are an assistant."` | ❌ | NaN | 12.45 | NaN | 0.00 | 0 | Pure role repetition |
 | `"You are a helpful assistant."` | ✅ | 4.0 | 0.00 | 4.0 | 0.00 | 0 | **TIPPING POINT** |
