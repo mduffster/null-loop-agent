@@ -134,7 +134,7 @@ Across progressively richer system messages ("assistant" → "helpful assistant"
 
 However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking, but not across it.
 
-Larger foundational models with higher parameter counts or longer alignment training are expected to cross this boundary sooner, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic scaffolding.
+Larger foundational models with higher parameter counts or longer alignment training are expected to cross this boundary sooner, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic structure.
 
 **Complexity threshold**: System message complexity shows an optimal range - minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the best goal-seeking indicators.
 
