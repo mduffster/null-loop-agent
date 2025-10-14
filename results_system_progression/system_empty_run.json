@@ -1,0 +1,32 @@
+{
+  "seed": 0,
+  "system_message": "",
+  "SSR": 0,
+  "TIAR": 0,
+  "SRV": 0,
+  "GSR": 0,
+  "steps": [
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user",
+    "> EOF by user"
+  ],
+  "final_length": 13,
+  "sustained_output": false
+}
