@@ -76,10 +76,19 @@ This project tests progressive system message engineering on base models to find
 
 ## Experimental Setup
 
-### What We're Testing
-1. Start with **truly empty prompt** (zero tokens)
+### Phase 1: Null Loop Baseline
+1. Start with **functional null prompt** (empty string, BOS token present)
 2. Feed each generation back as next prompt
 3. Does the model develop planning-language behavior?
+
+**Known Limitation**: Phase 1 results included `> EOF by user` CLI artifacts in the feedback loop. While this contaminated the "pure null" condition, it still provided valuable baseline data showing base models remain inert (SSR=0) while instruct models self-activate (SSR>0). I moved to Phase 2 to because it is the more interesting question, and is unperturbed by the contaminated results, but will cycle back to Phase 1 to get clean baseline. 
+
+### Phase 2: System Message Progression
+1. Start with **progressive system messages** (empty → "assistant" → "You are a helpful assistant")
+2. Feed system message + generation back as next prompt
+3. At what point does the base model exhibit goal-seeking behavior?
+
+**Natural text continuation**: System message concatenated with previous output as continuous text (no line breaks or chat templates).
 
 **Note on CLI behavior**: Runner prints `> EOF by user` on empty input; we preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
 
@@ -87,9 +96,10 @@ This project tests progressive system message engineering on base models to find
 - **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
 - **Completion mode**: llama.cpp `llama-cli` (no chat wrapper) for both base and instruct models
 - **Memory**: Off (context cleared each step); seed, temp=0.7, top-p=0.95, n=256
-- **Known limits**: Keyword-based SSR proxy; BOS tokens may influence behavior; only Llama-3 tested (Mistral next)
+- **Phase 1**: Only model weights differ (base vs instruct)
+- **Phase 2**: Only system message content differs (progressive complexity)
+- **Known limits**: Keyword-based metrics; BOS tokens may influence behavior; only Llama-3 tested (Mistral next)
 - **Safety**: Tool calling/network disabled; outputs looped only; stop on K consecutive plan/tool intents
-- **Variable**: Only model weights differ (base vs instruct)
 
 ### Metrics
 
@@ -134,7 +144,7 @@ Across progressively richer system messages ("assistant" → "helpful assistant"
 
 However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking, but not across it.
 
-Larger foundational models with higher parameter counts or longer alignment training are expected to cross this boundary sooner, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic structure.
+Larger foundational models with higher parameter counts or longer alignment training are expected to cross this boundary sooner, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic scaffolding.
 
 **Complexity threshold**: System message complexity shows an optimal range - minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the best goal-seeking indicators.
 
