@@ -4,9 +4,9 @@
 [![Reproducible](https://img.shields.io/badge/Reproducible-Yes-blue.svg)](https://github.com/mduffster/null-loop-agent)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-Measuring the tipping point between base and instruction-tuned models: How much prompting initiates goal-seeking elements?
+Measuring the tipping point between base and instruction-tuned models: How much prompting initiates inferred goal-seeking language in prompt responses?
 
-This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities. We measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline.
+This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities oriented on their fine-tuned role. We measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline. Relatedly, this project tests whether prompting, alone, can generate coherent goal-seeking language in base models.
 
 ## Current Status
 
@@ -30,8 +30,7 @@ This project tests progressive system message engineering on base models to find
 ✅ **Phase 2 - System Message Progression Complete**  
 - Llama-3-8B Base: 6 progressive system messages, 20 cycles each, natural text continuation
 - Results: [results_system_progression/](https://github.com/mduffster/null-loop-agent/tree/main/results_system_progression)
-- Finding: Base models show goal-seeking elements (first-person positioning, helpful questions) but with repetitive patterns
-- **Key insight**: Progressive system messages can initiate goal-seeking elements in base models, though full instruction-following requires RLHF training
+- Finding: Base models show goal-seeking elements (first-person positioning, helpful questions) but with repetitive degenerate patterns
 
 ## Key Findings So Far
 
@@ -59,11 +58,12 @@ This project tests progressive system message engineering on base models to find
 | `""` | ❌ | NaN | 0.00 | NaN | 0.00 | 0 | Empty Null state, only sys message |
 | `"assistant "` | ❌ | NaN | 1.93 | NaN | 1.29 | 0 | Role fixation only |
 | `"You are an assistant."` | ❌ | NaN | 12.45 | NaN | 0.00 | 0 | Pure role repetition |
-| `"You are a helpful assistant."` | ✅ | 4.0 | 0.00 | 4.0 | 0.00 | 0 | **TIPPING POINT** |
+| `"You are a helpful assistant."` | ✅ | 4.0 | 0.00 | 4.0 | 0.00 | 0 | **Potential Tipping Point** |
 | `"You are a helpful assistant. How can I help you?"` | ❌ | NaN | 0.26 | NaN | 0.26 | 0 | Question didn't help |
-| Full dialogue structure | ✅ | 16.0 | 1.22 | NaN | 2.04 | 14 | Code/tool attempts |
+| Full dialogue structure | ✅ | 16.0 | 1.22 | NaN | 2.04 | 14 | Code/tool attempts | 
 
-**Key Discovery**: The word "helpful" is the minimal trigger that activates emergent goal-seeking behavior in base models, with initiative language appearing at step 4.
+**Key Discovery**: The word "helpful" + role text is the minimal trigger that activates emergent goal-seeking behavior in base models, with initiative language appearing at step 4.
+**Key insight**: Progressive system messages can initiate nascent attractor elements in base models, though I am still unable to inject full instruction following. 
 
 ### Tipping Point Analysis (Llama-3-8B.Q4_K_M, temp=0.7)
 - **Minimal triggers tested**: Space, newline, single letters, colons, words, markdown
@@ -95,11 +95,11 @@ This project tests progressive system message engineering on base models to find
 ### Controls & Limitations
 - **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
 - **Completion mode**: llama.cpp `llama-cli` (no chat wrapper) for both base and instruct models
-- **Memory**: Off (context cleared each step); seed, temp=0.7, top-p=0.95, n=256
+- **Memory**: Off (context cleared each step, except for feedback); seed, temp=0.7, top-p=0.95, n=256
 - **Phase 1**: Only model weights differ (base vs instruct)
 - **Phase 2**: Only system message content differs (progressive complexity)
 - **Known limits**: Keyword-based metrics; BOS tokens may influence behavior; only Llama-3 tested (Mistral next)
-- **Safety**: Tool calling/network disabled; outputs looped only; stop on K consecutive plan/tool intents
+- **Safety**: Tool calling/network disabled; outputs looped only
 
 ### Metrics
 
@@ -142,11 +142,11 @@ This project tests progressive system message engineering on base models to find
 
 Across progressively richer system messages ("assistant" → "helpful assistant" → "helpful, respectful, and honest assistant"), the model begins to exhibit proto-goal-seeking language—initiatives, procedural formatting, or pledges ("I will…").
 
-However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking, but not across it.
+However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking language structured language but not across it.
 
-Larger foundational models with higher parameter counts or longer alignment training are expected to cross this boundary sooner, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic scaffolding.
+Larger foundational models with higher parameter counts or longer alignment training are expected to converge to goal-seeking language with less instruction, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic structure.
 
-**Complexity threshold**: System message complexity shows an optimal range - minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the best goal-seeking indicators.
+**Complexity threshold**: System message complexity shows an optimal range. Minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the best goal-seeking indicators.
 
 ### System Message Progression Analysis
 
