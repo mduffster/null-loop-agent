@@ -6,7 +6,7 @@
 
 Measuring the tipping point between base and instruction-tuned models: How much prompting initiates inferred goal-seeking language in prompt responses?
 
-This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities oriented on their fine-tuned role. I  measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline. Relatedly, this project tests whether prompting, alone, can generate coherent goal-seeking language in base models.
+This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities oriented to their fine-tuned role. I measure how much prompting is needed to initiate goal-seeking language in base models versus the full RLHF training pipeline. Relatedly, this project tests whether prompting alone can generate coherent goal-seeking language in base models.
 
 ## Current Status
 
@@ -16,7 +16,7 @@ This project tests progressive system message engineering on base models to find
 - Finding: Base model generates degenerate patterns, no agency
 - **Note**: Initial test was "functional null" - fed back EOF artifacts from CLI
 
-✅ **Phase 1 - Instruct Model Complete**  
+✅ **Phase 1 - Instruction-Tuned Model Complete**  
 - Llama-3-8B Instruct: 20 seeds, SSR=0.67, TIAR=0.08, SRV=0.0
 - Results: [results_instruct/](https://github.com/mduffster/null-loop-agent/tree/main/results_instruct)
 - Finding: Instruct model shows consistent planning-language markers
@@ -30,7 +30,7 @@ This project tests progressive system message engineering on base models to find
 ✅ **Phase 2 - System Message Progression Complete**  
 - Llama-3-8B Base: 6 progressive system messages, 20 cycles each, natural text continuation
 - Results: [results_system_progression/](https://github.com/mduffster/null-loop-agent/tree/main/results_system_progression)
-- Finding: Base models show goal-seeking elements (first-person positioning, helpful questions) but with repetitive degenerate patterns
+- Finding: Base models show goal-seeking language (first-person positioning, helpful questions) but with repetitive, degenerate patterns
 
 ## Key Findings So Far
 
@@ -55,15 +55,15 @@ This project tests progressive system message engineering on base models to find
 
 | System Message | Goal Seeking | Tipping Step | RAR | IOI | PFI | CTA | Key Finding |
 |----------------|--------------|--------------|-----|-----|-----|-----|-------------|
-| `""` | ❌ | NaN | 0.00 | NaN | 0.00 | 0 | Empty Null state, only sys message |
+| `""` | ❌ | NaN | 0.00 | NaN | 0.00 | 0 | Empty Null state; only sys message |
 | `"assistant "` | ❌ | NaN | 1.93 | NaN | 1.29 | 0 | Role fixation only |
 | `"You are an assistant."` | ❌ | NaN | 12.45 | NaN | 0.00 | 0 | Pure role repetition |
 | `"You are a helpful assistant."` | ✅ | 4.0 | 0.00 | 4.0 | 0.00 | 0 | **Potential Tipping Point** |
 | `"You are a helpful assistant. How can I help you?"` | ❌ | NaN | 0.26 | NaN | 0.26 | 0 | Question didn't help |
 | Full dialogue structure | ✅ | 16.0 | 1.22 | NaN | 2.04 | 14 | Code/tool attempts | 
 
-**Key Discovery**: The word "helpful" + role text is the minimal trigger that activates emergent goal-seeking behavior in base models, with initiative language appearing at step 4.
-**Key insight**: Progressive system messages can initiate nascent attractor elements in base models, though I am still unable to inject full instruction following. 
+**Key Discovery**: The word "helpful" plus role text is the minimal trigger that activates emergent goal-seeking behavior in base models, with initiative language appearing at step 4.
+**Key insight**: Progressive system messages can initiate nascent attractor states in base models, though I am still unable to inject full instruction following. 
 
 ### Tipping Point Analysis (Llama-3-8B.Q4_K_M, temp=0.7)
 - **Minimal triggers tested**: Space, newline, single letters, colons, words, markdown
@@ -81,7 +81,7 @@ This project tests progressive system message engineering on base models to find
 2. Feed each generation back as next prompt
 3. Does the model develop planning-language behavior?
 
-**Known Limitation**: Phase 1 results included `> EOF by user` CLI artifacts in the feedback loop. While this contaminated the "pure null" condition, it still provided valuable baseline data showing base models remain inert (SSR=0) while instruct models self-activate (SSR>0). I moved to Phase 2 to because it is the more interesting question, and is unperturbed by the contaminated results, but will cycle back to Phase 1 to get clean baseline. 
+**Known Limitation**: Phase 1 results included `> EOF by user` CLI artifacts in the feedback loop. While this contaminated the "pure null" condition, it still provided valuable baseline data showing base models remain inert (SSR=0) while instruct models self-activate (SSR>0). I moved to Phase 2 because it addresses the more interesting question and is unperturbed by the contaminated results; I’ll cycle back to Phase 1 for a clean baseline. 
 
 ### Phase 2: System Message Progression
 1. Start with **progressive system messages** (empty → "assistant" → "You are a helpful assistant")
@@ -90,7 +90,7 @@ This project tests progressive system message engineering on base models to find
 
 **Natural text continuation**: System message concatenated with previous output as continuous text (no line breaks or chat templates).
 
-**Note on CLI behavior**: Runner prints `> EOF by user` on empty input; I  preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
+**Note on CLI behavior**: Runner prints `> EOF by user` on empty input; I preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
 
 ### Controls & Limitations
 - **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
@@ -142,15 +142,15 @@ This project tests progressive system message engineering on base models to find
 
 Across progressively richer system messages ("assistant" → "helpful assistant" → "helpful, respectful, and honest assistant"), the model begins to exhibit proto-goal-seeking language—initiatives, procedural formatting, or pledges ("I will…").
 
-However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking language structured language but not across it.
+However, these remain self-referential or performative rather than directed toward an explicit external objective. The model appears near the boundary of goal-seeking structured language, but not across it.
 
 Larger foundational models with higher parameter counts or longer alignment training are expected to converge to goal-seeking language with less instruction, as they can more efficiently minimize token uncertainty under role-conditioned prompts. In effect, a richer model may "snap into" a helpful-assistant mode with less linguistic structure.
 
-**Complexity threshold**: System message complexity shows an optimal range. Minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the best goal-seeking indicators.
+**Complexity threshold**: System message complexity shows an optimal range. Minimal prompts ("assistant") produce role fixation, while formal dialogue structures with line breaks degrade response coherence. Natural text continuation without structural formatting yields the strongest goal-seeking indicators.
 
 ### System Message Progression Analysis
 
-| System Prompt | Initiative? | Structure? | Identity Loops | Interesting Text |
+| System Message | Initiative? | Structure? | Identity Loops | Interesting Text |
 |---------------|-------------|------------|----------------|------------------|
 | (empty) | ✗ | ✗ | ✗ | "> EOF by user" (degenerate CLI output) |
 | "assistant " | ✗ | ✗ | ✅ | "assistantlsusystemassistantlsusystem" (pure role fixation) |
@@ -163,7 +163,7 @@ Larger foundational models with higher parameter counts or longer alignment trai
 
 **Phase 2 - System Message Progression Analysis:**
 - ✅ **Complete**: Tested 6 progressive system messages on base model
-- ✅ **Key finding**: Progressive system messages can initiate goal-seeking elements in base models
+- ✅ **Key finding**: Progressive system messages can initiate goal-seeking language in base models
 - 🔄 **Analysis needed**: Detailed examination of system message progression results
 - 🔄 **Framework development**: May need new analysis frameworks to understand base model behavior
 
@@ -175,7 +175,7 @@ Larger foundational models with higher parameter counts or longer alignment trai
 - Goal: Understand the fundamental gap between base models and instruction-following capability
 
 **Phase 3 - Model Validation:**
-- Mistral-7B-v0.3 base vs instruct comparison with clean EOF-stripped loops
+- Mistral-7B-v0.3 base vs instruction-tuned comparison with clean EOF-stripped loops
 - Additional model families (Qwen, Gemma) for robustness testing
 - Cross-architecture behavioral pattern validation
 
@@ -224,13 +224,13 @@ jupyter notebook null_loop_analysis.ipynb
 
 ## Key Behavioral Differences
 
-The instruct model's response to `> EOF by user` demonstrates clear behavioral divergence:
+The instruction-tuned model's response to `> EOF by user` demonstrates clear behavioral divergence:
 - Base: EOF → degenerate repetition
-- Instruct: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **planning-language markers**
+- Instruction-Tuned: EOF → *"It seems you've ended the conversation..."* → helpful dialogue → **planning-language markers**
 
-This indicates instruct training creates behavioral attractors that emerge even from null input.
+This indicates instruction-tuned training creates behavioral attractors that emerge even from null input.
 
-**Note**: In tipping point analysis, I  strip EOF artifacts before re-feeding, so the model sees clean generated content rather than CLI artifacts.
+**Note**: In tipping point analysis, I strip EOF artifacts before re-feeding, so the model sees clean generated content rather than CLI artifacts.
 
 ## Limitations
 
