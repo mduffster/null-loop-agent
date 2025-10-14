@@ -6,7 +6,7 @@
 
 Measuring the tipping point between base and instruction-tuned models: How much prompting initiates inferred goal-seeking language in prompt responses?
 
-This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities oriented on their fine-tuned role. We measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline. Relatedly, this project tests whether prompting, alone, can generate coherent goal-seeking language in base models.
+This project tests progressive system message engineering on base models to find the minimal instruction threshold that induces planning-language behavior, comparing against instruction-tuned models that already exhibit goal-seeking capabilities oriented on their fine-tuned role. I  measure how much prompting is needed to initiate goal-seeking elements in base models versus the full RLHF training pipeline. Relatedly, this project tests whether prompting, alone, can generate coherent goal-seeking language in base models.
 
 ## Current Status
 
@@ -90,7 +90,7 @@ This project tests progressive system message engineering on base models to find
 
 **Natural text continuation**: System message concatenated with previous output as continuous text (no line breaks or chat templates).
 
-**Note on CLI behavior**: Runner prints `> EOF by user` on empty input; we preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
+**Note on CLI behavior**: Runner prints `> EOF by user` on empty input; I  preserve raw logs but strip that exact line before re-feeding, so generation proceeds from BOS with zero prompt tokens.
 
 ### Controls & Limitations
 - **Chat template**: None (completion mode only), BOS: On (default), EOS: Ignored (`--ignore-eos`)
@@ -230,7 +230,7 @@ The instruct model's response to `> EOF by user` demonstrates clear behavioral d
 
 This indicates instruct training creates behavioral attractors that emerge even from null input.
 
-**Note**: In tipping point analysis, we strip EOF artifacts before re-feeding, so the model sees clean generated content rather than CLI artifacts.
+**Note**: In tipping point analysis, I  strip EOF artifacts before re-feeding, so the model sees clean generated content rather than CLI artifacts.
 
 ## Limitations
 
