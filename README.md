@@ -1,6 +1,5 @@
 # Null Loop Agent Experiments
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Reproducible](https://img.shields.io/badge/Reproducible-Yes-blue.svg)](https://github.com/mduffster/null-loop-agent)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
